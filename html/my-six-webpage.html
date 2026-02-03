@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--viewport:반응형 웹용 필수 코드-->
+  <!--웹페이지는 PC, 노트북, 테블릿, 스마트폰 등 해상도가 다르다.-->
+ <title> 개발자 도구 실습 </title>
+ <style>
+ body {
+ font-family: Arial, sans-serif; /*글꼴*/
+ margin: 10 px; /*여백*/
+ }
+ .highlight /*class*/ {
+ background-color: #C8AAAA;
+ padding: 10px; /*여백*/
+ border-radius: 50px; /*라운드*/
+ }
+ button /*버튼 기본 스타일*/ {
+ background-color: #574964;
+ color:#FFDAB3;
+ padding: 10px 20px; /*여백*/
+ border: none;
+ border-radius: 50px;
+ cursor: pointer;
+ }
+ button:hover /*버튼에 마우스가 올라갔을 때 스타일*/ {
+ background-color: #9F8383;
+ }
+ </style>
+
+</head>
+<body>
+ <h1>개발자 도구 실습 페이지</h1>
+ <p class="highlight">색상을 변경할 수 있습니다.</p>
+<!--스타일이 .highlight{}가 적용된다. -->
+ <button onclick="alert('버튼이 클릭되었습니다!')">클릭미!</button>
+ <!--스타일 button{}가 적용된다. |onclick 경고창 -->
+ <!--스타일 button:hover{} 가 적용된다.-->
+ <ul>
+ <li>첫 번째 항목</li>
+ <li>두 번째 항목</li>
+ <li>세 번째 항목</li>
+ </ul>
+</body>
+</html>

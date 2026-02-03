@@ -1,0 +1,881 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <!-- =========================================================
+    [1] 문서 기본 설정
+    - charset: 한글이 깨지지 않게 UTF-8 설정
+    - viewport: 모바일에서 화면이 너무 크게/작게 보이지 않게 설정
+  ========================================================= -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MBC 아카데미 LMS</title>
+
+  <style>
+    /* =========================================================
+      [2] 폰트 불러오기 (@import)
+      - Pretendard Variable 폰트 CSS를 CDN에서 가져온다
+      - 이 줄이 없으면 "Pretendard Variable"은 없는 폰트라서
+        시스템 기본 폰트(맑은고딕/Segoe UI 등)로 대체된다.
+      - 인터넷이 안 되는 환경에서는 이 줄을 삭제하거나
+        폰트를 로컬 파일로 직접 넣어야 한다.
+    ========================================================= */
+    @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css");
+
+    /* =========================================================
+      [3] CSS 변수(테마 값) 모음
+      - :root는 문서 전체에 적용되는 변수를 정의하는 위치
+      - 색/그림자/라운드 같은 값들을 한 곳에 모아두면
+        "색 바꾸기" "톤 수정"이 쉬워진다.
+    ========================================================= */
+    :root{
+      --bg: #f6e7d6;                 /* 바깥 배경(베이지) */
+      --card: rgba(255,255,255,.92); /* 가운데 카드 배경(흰색 반투명) */
+      --stroke: rgba(17,24,39,.08);  /* 테두리 색(연한 회색) */
+      --text: #111827;               /* 기본 글자색(짙은 검정) */
+      --muted: rgba(17,24,39,.55);   /* 보조 글자색(연한 검정) */
+      --shadow: 0 18px 55px rgba(17,24,39,.12);  /* 카드 그림자 */
+      --accent: #f2e94e;             /* 포인트 색(MBC 노랑 느낌) */
+      --radius: 18px;                /* 둥근 모서리 */
+    }
+
+    /* =========================================================
+      [4] 기본 리셋
+      - box-sizing: border-box 는 padding/border 포함해서
+        width/height 계산이 되게 만들어 레이아웃이 안정적이다.
+    ========================================================= */
+    *{ box-sizing: border-box; }
+
+    /* =========================================================
+      [5] body(전체 화면) 스타일
+      - 화면 중앙 정렬
+      - 배경: 그라데이션 + 베이지
+    ========================================================= */
+    body{
+      margin: 0;
+
+      /* 폰트 우선순위:
+         1) Pretendard Variable (CDN에서 import해온 폰트)
+         2) Pretendard
+         3) 운영체제 기본 폰트(맥/윈도우)
+      */
+      font-family: "Pretendard Variable", Pretendard, -apple-system,
+                   BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+      /* 배경을 그냥 단색으로 두면 심심하니까
+         radial-gradient로 은은한 빛 번짐 효과를 준다.
+      */
+      background:
+        radial-gradient(1200px 500px at 20% 10%, rgba(255,255,255,.7), transparent 60%),
+        radial-gradient(1000px 600px at 80% 90%, rgba(255,255,255,.55), transparent 55%),
+        var(--bg);
+
+      color: var(--text);
+
+      /* 최소 높이를 화면 전체로 */
+      min-height: 100vh;
+
+      /* 카드가 화면 중앙에 오게 flex 사용 */
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      /* 화면 가장자리에서 카드가 딱 붙지 않도록 여백 */
+      padding: 28px;
+    }
+
+    /* =========================================================
+      [6] frame: 메인 카드(하얀 박스)
+      - 이미지 참고처럼 가운데 큰 흰색 영역
+      - position: relative를 주면 내부 absolute 요소(워터마크 등)의 기준이 된다.
+    ========================================================= */
+    .frame{
+      width: min(1080px, 100%);        /* 최대 1080px, 화면이 작으면 100% */
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      position: relative;              /* 내부 absolute 요소의 기준 */
+      overflow: hidden;                /* 바깥으로 넘치는 요소 숨김 */
+      min-height: 560px;
+    }
+
+    /* =========================================================
+      [7] bg-typo: 큰 "MBC" 배경 텍스트(워터마크)
+      - pointer-events: none
+        → 글자 위를 클릭해도 클릭이 막히지 않게 함
+      - user-select: none
+        → 드래그로 선택되지 않게 함
+    ========================================================= */
+    .bg-typo{
+      position:absolute;
+      inset: 0;                        /* top/right/bottom/left: 0 */
+      pointer-events:none;
+      user-select:none;
+      display:flex;
+      align-items:flex-end;            /* 아래쪽에 붙임 */
+      justify-content:center;
+      padding-bottom: 36px;
+      opacity: .95;
+    }
+    .bg-typo span{
+      font-weight: 900;
+      letter-spacing: -0.06em;
+      font-size: clamp(140px, 20vw, 360px);
+      line-height: .85;
+      color: var(--accent);
+      mix-blend-mode: multiply;        /* 배경과 자연스럽게 섞임 */
+      transform: translateY(18px);
+      white-space: nowrap;
+    }
+
+    /* =========================================================
+      [8] header: 상단 영역
+      - 좌측: 로고/브랜드
+      - 우측: 로그인/회원가입/로그아웃 버튼
+      - z-index를 크게 주는 이유:
+        워터마크(MBC)보다 위에 보이게 하기 위해
+    ========================================================= */
+    header{
+      position:relative;
+      z-index: 3;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 22px 26px;
+    }
+
+    /* 좌측 브랜드(로고 + 텍스트) */
+    .brand{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    /* M 아이콘(노란 박스) */
+    .brand-badge{
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--accent);
+      box-shadow: 0 10px 24px rgba(242,233,78,.35);
+      display:grid;
+      place-items:center;
+      font-weight: 900;
+    }
+
+    /* 브랜드 아래 작은 설명 */
+    .brand small{
+      display:block;
+      font-weight: 600;
+      color: var(--muted);
+      margin-top: 2px;
+      letter-spacing: 0;
+    }
+
+    /* 우측 상단 버튼 영역 */
+    .header-actions{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+    }
+
+    /* 공통 버튼 스타일 */
+    .btn{
+      border: 1px solid rgba(17,24,39,.10);
+      background: rgba(255,255,255,.75);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .08s ease, background .15s ease, border-color .15s ease;
+    }
+    .btn:hover{
+      background: rgba(255,255,255,.95);
+      border-color: rgba(17,24,39,.18);
+    }
+    .btn:active{ transform: translateY(1px); }
+
+    /* 강조 버튼(검정) */
+    .btn.primary{
+      background: var(--text);
+      color: white;
+      border-color: rgba(17,24,39,.18);
+    }
+    .btn.primary:hover{ background: rgba(17,24,39,.92); }
+
+    /* =========================================================
+      [9] main: 홈 화면 컨텐츠
+      - 환영문구 + 카테고리 버튼
+    ========================================================= */
+    main{
+      position:relative;
+      z-index: 3;
+      padding: 34px 26px 34px;
+      display:flex;
+      flex-direction: column;
+      gap: 22px;
+      align-items:flex-start;
+    }
+
+    .kicker{
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    h1{
+      margin: 0;
+      font-size: clamp(28px, 3.2vw, 44px);
+      line-height: 1.12;
+      letter-spacing: -0.04em;
+    }
+
+    /* Welcome 밑에 노란 형광펜 느낌 */
+    .highlight{
+      position: relative;
+      display:inline-block;
+    }
+    .highlight::after{
+      content:"";
+      position:absolute;
+      left:-6px;
+      right:-6px;
+      bottom: 4px;
+      height: 0.55em;
+      background: rgba(242,233,78,.85);
+      z-index: -1;
+      border-radius: 8px;
+      transform: rotate(-1deg);
+    }
+
+    /* 카테고리 버튼들이 한 줄/여러 줄로 자연스럽게 줄바꿈 */
+    .category-row{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    /* 카테고리 버튼(칩) */
+    .chip{
+      border: 1px solid rgba(17,24,39,.12);
+      background: rgba(255,255,255,.70);
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-weight: 800;
+      cursor:pointer;
+      transition: background .15s ease, transform .08s ease, border-color .15s ease;
+    }
+    .chip:hover{
+      background: rgba(17,24,39,.06);
+      border-color: rgba(17,24,39,.18);
+    }
+    .chip:active{ transform: translateY(1px); }
+
+    /* =========================================================
+      [10] footer-nav: 아래쪽 안내 텍스트
+    ========================================================= */
+    .footer-nav{
+      position:absolute;
+      left: 26px;
+      right: 26px;
+      bottom: 22px;
+      z-index: 3;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    /* =========================================================
+      [11] page: 화면 전환용(로그인/회원가입/서비스 화면)
+      - SPA(싱글 페이지 앱)처럼 "한 파일 안에서" 화면을 바꾼다.
+      - 원리: 모든 page를 display:none으로 숨겨놓고,
+              active 클래스가 붙은 화면만 display:block으로 보이게 한다.
+    ========================================================= */
+    .page{
+      display:none;
+      padding: 10px 26px 70px; /* 하단 footer랑 겹치지 않도록 아래 여백 */
+      position:relative;
+      z-index: 3;
+    }
+    .page.active{
+      display:block;
+    }
+
+    /* 카드 내부에 작은 박스(로그인 폼 등) */
+    .panel{
+      margin-top: 16px;
+      border: 1px solid rgba(17,24,39,.10);
+      background: rgba(255,255,255,.70);
+      border-radius: 16px;
+      padding: 18px;
+      max-width: 520px;
+    }
+
+    /* 입력창 영역(라벨+input) */
+    .field{
+      display:flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .field label{
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .field input{
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(17,24,39,.12);
+      outline: none;
+      font-weight: 700;
+    }
+
+    /* 작은 안내 문구 */
+    .hint{
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    /* 모바일 화면에서는 패딩을 조금 줄여서 더 보기 좋게 */
+    @media (max-width: 640px){
+      header{ padding: 18px; }
+      main{ padding: 18px; }
+      .footer-nav{ left: 18px; right: 18px; }
+      .page{ padding-left: 18px; padding-right: 18px; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- =========================================================
+    [A] frame: 전체 카드 컨테이너
+  ========================================================= -->
+  <div class="frame">
+
+    <!-- 큰 배경 워터마크 -->
+    <div class="bg-typo" aria-hidden="true">
+      <span>MBC</span>
+    </div>
+
+    <!-- =========================================================
+      [B] header: 상단 영역
+      - 좌측: 로고/브랜드
+      - 우측: 로그인/회원가입/로그아웃
+    ========================================================= -->
+    <header>
+      <div class="brand">
+        <div class="brand-badge">M</div>
+        <div>
+          MBC 아카데미
+          <small>LMS Program</small>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- 로그인 전에는 로그인/회원가입만 보이게 -->
+        <button class="btn" id="loginBtn">로그인</button>
+        <button class="btn primary" id="signupBtn">회원가입</button>
+
+        <!-- 로그인 후에는 로그아웃만 보이게 (처음엔 숨김) -->
+        <button class="btn" id="logoutBtn" style="display:none;">로그아웃</button>
+      </div>
+    </header>
+
+    <!-- =========================================================
+      [C] HOME 페이지 (처음 보이는 화면)
+    ========================================================= -->
+    <main class="page active" id="page-home">
+      <!-- 작은 상단 텍스트 -->
+      <div class="kicker" id="welcomeKicker">Main / Home</div>
+
+      <!-- 중앙 문구 (요구사항 그대로) -->
+      <h1>
+        <span class="highlight">Welcome aboard.</span><br/>
+        MBC Academy Program
+      </h1>
+
+      <!-- 카테고리 버튼들 -->
+      <!-- data-route="members" 이런 값은 JS에서 페이지 전환 키로 사용한다 -->
+      <div class="category-row" id="categoryRow">
+        <button class="chip" data-route="members">회원관리</button>
+        <button class="chip" data-route="scores">성적관리</button>
+        <button class="chip" data-route="freeboard">자유게시판</button>
+        <button class="chip" data-route="databoard">자료실</button>
+        <button class="chip" data-route="shop">쇼핑몰</button>
+        <!-- 관리자페이지 버튼은 로그인 시 role=admin이면 JS로 "마지막에" 추가 -->
+      </div>
+
+      <!-- 현재 상태 안내 -->
+      <div class="hint" id="statusHint">
+        현재: 비로그인 상태입니다. (우측 상단에서 로그인/회원가입 가능)
+      </div>
+    </main>
+
+    <!-- =========================================================
+      [D] LOGIN 페이지
+      - 아이디/비번 입력 후 로그인
+      - 데모 규칙:
+        admin / 1234 → 관리자(admin)
+        그 외 → 일반 사용자(user)
+    ========================================================= -->
+    <section class="page" id="page-login">
+      <div class="kicker">Auth / Login</div>
+      <h1>로그인</h1>
+
+      <div class="panel">
+        <div class="field">
+          <label>아이디</label>
+          <input id="loginUid" placeholder="예: admin" />
+        </div>
+
+        <div class="field">
+          <label>비밀번호</label>
+          <input id="loginPw" type="password" placeholder="예: 1234" />
+        </div>
+
+        <!-- 로그인 실행 버튼 -->
+        <button class="btn primary" id="doLoginBtn">로그인</button>
+
+        <!-- 홈으로 되돌아가기 -->
+        <button class="btn" id="goHomeFromLogin">홈으로</button>
+
+        <div class="hint">
+          데모 계정<br/>
+          - 관리자: <b>admin</b> / <b>1234</b><br/>
+          - 그 외 입력: 일반 사용자로 로그인 처리
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+      [E] SIGNUP 페이지
+      - 실제 서비스라면 DB INSERT로 저장해야 함
+      - 지금은 데모: 가입 완료 메시지만 띄움
+    ========================================================= -->
+    <section class="page" id="page-signup">
+      <div class="kicker">Auth / Signup</div>
+      <h1>회원가입</h1>
+
+      <div class="panel">
+        <div class="field">
+          <label>아이디</label>
+          <input id="signupUid" placeholder="아이디 입력" />
+        </div>
+
+        <div class="field">
+          <label>비밀번호</label>
+          <input id="signupPw" type="password" placeholder="비밀번호 입력" />
+        </div>
+
+        <div class="field">
+          <label>이름</label>
+          <input id="signupName" placeholder="이름 입력" />
+        </div>
+
+        <button class="btn primary" id="doSignupBtn">회원가입(데모)</button>
+        <button class="btn" id="goHomeFromSignup">홈으로</button>
+
+        <div class="hint">
+          지금은 데모라서 실제 저장 대신 “가입 완료”만 표시해요.<br/>
+          나중에 MySQL members 테이블 INSERT로 연결하면 됩니다.
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+      [F] 서비스 화면들(샘플)
+      - 메뉴 버튼 클릭하면 여기로 이동
+      - 실제 프로젝트에서는 페이지/라우트로 분리 가능
+    ========================================================= -->
+    <section class="page" id="page-members">
+      <div class="kicker">Service / Members</div>
+      <h1>회원관리</h1>
+      <div class="panel">
+        여기는 회원관리 화면입니다.<br/>
+        (추후: 회원 목록/검색/수정/삭제 기능 연결)
+        <div class="hint">※ 로그인 필요로 만들려면 JS에서 체크하면 됨</div>
+        <button class="btn" data-go="home">홈으로</button>
+      </div>
+    </section>
+
+    <section class="page" id="page-scores">
+      <div class="kicker">Service / Scores</div>
+      <h1>성적관리</h1>
+      <div class="panel">
+        여기는 성적관리 화면입니다.
+        <button class="btn" data-go="home">홈으로</button>
+      </div>
+    </section>
+
+    <section class="page" id="page-freeboard">
+      <div class="kicker">Board / Free</div>
+      <h1>자유게시판</h1>
+      <div class="panel">
+        여기는 자유게시판 화면입니다.
+        <button class="btn" data-go="home">홈으로</button>
+      </div>
+    </section>
+
+    <section class="page" id="page-databoard">
+      <div class="kicker">Board / Data</div>
+      <h1>자료실</h1>
+      <div class="panel">
+        여기는 자료실 화면입니다.
+        <button class="btn" data-go="home">홈으로</button>
+      </div>
+    </section>
+
+    <section class="page" id="page-shop">
+      <div class="kicker">Service / Shop</div>
+      <h1>쇼핑몰</h1>
+      <div class="panel">
+        여기는 쇼핑몰 화면입니다.
+        <button class="btn" data-go="home">홈으로</button>
+      </div>
+    </section>
+
+    <!-- =========================================================
+      [G] 관리자 화면
+      - 관리자(role=admin)만 접근 가능하게 JS에서 막는다
+    ========================================================= -->
+    <section class="page" id="page-admin">
+      <div class="kicker">Admin / Dashboard</div>
+      <h1>관리자페이지</h1>
+      <div class="panel">
+        관리자만 볼 수 있는 화면입니다.<br/>
+        (예: 회원 권한 관리, 공지사항 관리, 상품 승인 등)
+        <button class="btn" data-go="home">홈으로</button>
+      </div>
+    </section>
+
+    <!-- =========================================================
+      [H] 하단 안내(항상 보임)
+    ========================================================= -->
+    <div class="footer-nav">
+      <div>© MBC Academy</div>
+      <div>메뉴를 선택하세요</div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+      [JS 1] DOM 요소 가져오기
+      - document.getElementById("id")는
+        HTML에서 id="id"인 요소를 찾아서 가져오는 함수
+      - 버튼 클릭 이벤트를 연결하려면 먼저 요소를 변수로 받아야 한다
+    ============================================================ */
+    const loginBtn   = document.getElementById("loginBtn");
+    const signupBtn  = document.getElementById("signupBtn");
+    const logoutBtn  = document.getElementById("logoutBtn");
+
+    const doLoginBtn = document.getElementById("doLoginBtn");
+    const doSignupBtn= document.getElementById("doSignupBtn");
+
+    const goHomeFromLogin  = document.getElementById("goHomeFromLogin");
+    const goHomeFromSignup = document.getElementById("goHomeFromSignup");
+
+    const categoryRow = document.getElementById("categoryRow");
+    const statusHint  = document.getElementById("statusHint");
+    const welcomeKicker = document.getElementById("welcomeKicker");
+
+    /* ============================================================
+      [JS 2] 페이지(화면) 관리
+      - pages 객체는 "이름 -> 실제 HTML 요소"를 연결해둔 지도(map)다.
+      - 예: showPage("login")을 하면 로그인 화면이 보인다.
+    ============================================================ */
+    const pages = {
+      home: document.getElementById("page-home"),
+      login: document.getElementById("page-login"),
+      signup: document.getElementById("page-signup"),
+      members: document.getElementById("page-members"),
+      scores: document.getElementById("page-scores"),
+      freeboard: document.getElementById("page-freeboard"),
+      databoard: document.getElementById("page-databoard"),
+      shop: document.getElementById("page-shop"),
+      admin: document.getElementById("page-admin"),
+    };
+
+    /* ============================================================
+      [JS 3] showPage(name)
+      - 모든 화면(page)에서 active를 제거(=숨김)
+      - 선택한 화면만 active를 추가(=보임)
+    ============================================================ */
+    function showPage(name){
+      // 1) pages 안의 모든 화면을 순회하면서 active를 지운다
+      Object.values(pages).forEach(p => p.classList.remove("active"));
+      // 2) 그 다음 원하는 화면 하나에만 active를 붙인다
+      pages[name].classList.add("active");
+    }
+
+    /* ============================================================
+      [JS 4] 세션(로그인 상태) 저장/복원
+      - localStorage는 "브라우저에 간단 데이터를 저장"하는 공간이다.
+      - 장점: 새로고침해도 데이터가 남아 있음.
+      - 단점: 보안상 민감한 정보(진짜 비밀번호)는 저장하면 안 됨!
+        → 실제 서비스는 서버 세션/쿠키/토큰을 사용한다.
+    ============================================================ */
+    const STORAGE_KEY = "mbc_lms_session"; // localStorage 키 이름
+
+    // session 변수는 현재 로그인 정보를 메모리에 들고 있는 상태
+    // 예: { uid:"admin", name:"관리자", role:"admin" }
+    let session = null;
+
+    // localStorage에 저장
+    function saveSession(obj){
+      // localStorage는 문자열만 저장 가능 -> JSON.stringify로 문자열 변환
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+    }
+
+    // localStorage에서 읽기
+    function loadSession(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return null;
+
+      // 문자열을 객체로 되돌리기
+      try{
+        return JSON.parse(raw);
+      }catch(e){
+        return null;
+      }
+    }
+
+    // localStorage에서 삭제(로그아웃)
+    function clearSession(){
+      localStorage.removeItem(STORAGE_KEY);
+    }
+
+    /* ============================================================
+      [JS 5] 관리자 메뉴(칩) 동적 추가/삭제
+      - 요구사항:
+        "관리자 아이디로 로그인하면 마지막에 카테고리 옆에 추가"
+      - 구현 방식:
+        1) 홈의 categoryRow(카테고리 버튼들) 맨 뒤에 appendChild로 추가
+        2) 관리자가 아니면 제거
+    ============================================================ */
+    function renderAdminMenu(){
+      // 이미 관리자 버튼이 있는지 검사(id로 찾음)
+      const exists = document.getElementById("adminMenuChip");
+
+      // (A) 관리자이고, 아직 버튼이 없다면 -> 생성해서 추가
+      if(session && session.role === "admin" && !exists){
+        const btn = document.createElement("button"); // 버튼 요소 새로 만들기
+        btn.className = "chip";                       // chip 스타일 적용
+        btn.id = "adminMenuChip";                     // 나중에 제거/검사하려고 id 부여
+        btn.dataset.route = "admin";                  // 클릭 시 admin 페이지로 이동하게 route 지정
+        btn.textContent = "관리자페이지";              // 버튼에 보일 글자
+
+        categoryRow.appendChild(btn);                 // "마지막에" 추가 (appendChild는 맨 끝에 붙임)
+      }
+
+      // (B) 관리자가 아닌데 버튼이 존재하면 -> 제거
+      if((!session || session.role !== "admin") && exists){
+        exists.remove();
+      }
+    }
+
+    /* ============================================================
+      [JS 6] 헤더 버튼 표시 제어
+      - 로그인 전: 로그인/회원가입 보이고, 로그아웃 숨김
+      - 로그인 후: 로그인/회원가입 숨기고, 로그아웃 보임
+    ============================================================ */
+    function renderHeaderButtons(){
+      const isLoggedIn = !!session; // session이 있으면 true, 없으면 false
+
+      loginBtn.style.display  = isLoggedIn ? "none" : "inline-block";
+      signupBtn.style.display = isLoggedIn ? "none" : "inline-block";
+      logoutBtn.style.display = isLoggedIn ? "inline-block" : "none";
+    }
+
+    /* ============================================================
+      [JS 7] 홈 화면 상태 문구 업데이트
+      - 사용자가 로그인했는지에 따라 안내 문구를 바꾼다
+    ============================================================ */
+    function renderHomeStatus(){
+      // 로그인 안 했으면 기본 문구
+      if(!session){
+        welcomeKicker.textContent = "Main / Home";
+        statusHint.textContent =
+          "현재: 비로그인 상태입니다. (우측 상단에서 로그인/회원가입 가능)";
+        return;
+      }
+
+      // 로그인 했으면 사용자 정보 표시
+      welcomeKicker.textContent = `Welcome, ${session.name} (${session.role})`;
+
+      // 관리자/일반 사용자 상태 안내
+      statusHint.textContent =
+        session.role === "admin"
+          ? "현재: 관리자 로그인 상태입니다. (관리자페이지 메뉴가 추가됨)"
+          : "현재: 일반 사용자 로그인 상태입니다.";
+    }
+
+    /* ============================================================
+      [JS 8] 로그인 처리(데모)
+      - 실제 서비스:
+        서버(Flask)로 uid/pw 전송 -> DB 조회 -> 성공/실패 결정
+      - 여기 데모:
+        admin/1234면 관리자, 나머지는 일반 user
+    ============================================================ */
+    function doLogin(){
+      const uid = document.getElementById("loginUid").value.trim();
+      const pw  = document.getElementById("loginPw").value.trim();
+
+      // 입력값이 비어있으면 로그인 못하게 막기
+      if(!uid || !pw){
+        alert("아이디/비밀번호를 입력해주세요.");
+        return;
+      }
+
+      // 데모 규칙: admin/1234 -> 관리자
+      if(uid === "admin" && pw === "1234"){
+        session = { uid, name:"관리자", role:"admin" };
+      }else{
+        // 일반 사용자: 이름을 uid로 대충 설정
+        session = { uid, name: uid, role:"user" };
+      }
+
+      // 로그인 정보를 브라우저에 저장(새로고침해도 유지)
+      saveSession(session);
+
+      // UI를 로그인 상태에 맞게 갱신
+      renderHeaderButtons();
+      renderAdminMenu();
+      renderHomeStatus();
+
+      // 홈으로 이동
+      showPage("home");
+
+      alert("로그인 성공!");
+    }
+
+    /* ============================================================
+      [JS 9] 회원가입 처리(데모)
+      - 실제 서비스에서는:
+        1) uid 중복 체크
+        2) 비밀번호 암호화
+        3) DB INSERT
+      - 여기서는 단순히 "가입 완료" 메시지만 출력
+    ============================================================ */
+    function doSignup(){
+      const uid  = document.getElementById("signupUid").value.trim();
+      const pw   = document.getElementById("signupPw").value.trim();
+      const name = document.getElementById("signupName").value.trim();
+
+      if(!uid || !pw || !name){
+        alert("아이디/비밀번호/이름을 모두 입력해주세요.");
+        return;
+      }
+
+      alert(`회원가입 완료(데모)\n아이디: ${uid}\n이름: ${name}`);
+
+      // 가입 후 로그인 페이지로 이동(보통 이런 UX)
+      showPage("login");
+    }
+
+    /* ============================================================
+      [JS 10] 로그아웃 처리
+      - session을 비우고, localStorage도 삭제한다.
+    ============================================================ */
+    function doLogout(){
+      session = null;
+      clearSession();
+
+      renderHeaderButtons();
+      renderAdminMenu();
+      renderHomeStatus();
+
+      showPage("home");
+      alert("로그아웃 완료!");
+    }
+
+    /* ============================================================
+      [JS 11] 카테고리 버튼 클릭 이벤트
+      - categoryRow 안에 있는 버튼은 event delegation 방식으로 처리
+      - 장점: 관리자 메뉴 버튼처럼 "나중에 추가되는 버튼"도 자동으로 동작한다.
+    ============================================================ */
+    categoryRow.addEventListener("click", (e) => {
+      // 클릭한 위치에서 가장 가까운 button[data-route] 찾기
+      const target = e.target.closest("button[data-route]");
+      if(!target) return; // 버튼이 아니면 무시
+
+      const route = target.dataset.route; // data-route 값 읽기
+
+      // 관리자 페이지 접근 제어
+      if(route === "admin"){
+        // 로그인 안 했으면 로그인 페이지로 보내기
+        if(!session){
+          alert("관리자페이지는 로그인 후 이용 가능합니다.");
+          showPage("login");
+          return;
+        }
+        // 로그인 했는데 admin이 아니면 막기
+        if(session.role !== "admin"){
+          alert("관리자 권한이 없습니다.");
+          return;
+        }
+      }
+
+      // 조건 통과하면 해당 페이지로 이동
+      showPage(route);
+    });
+
+    /* ============================================================
+      [JS 12] "홈으로" 버튼 처리
+      - 서비스 화면마다 홈으로 돌아가는 버튼을 넣었는데
+      - data-go="home"인 버튼을 누르면 홈으로 이동하게 만든다.
+    ============================================================ */
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-go]");
+      if(!btn) return;
+
+      if(btn.dataset.go === "home"){
+        showPage("home");
+      }
+    });
+
+    /* ============================================================
+      [JS 13] 헤더 버튼 이벤트 연결
+      - 로그인 버튼 -> 로그인 페이지로 이동
+      - 회원가입 버튼 -> 회원가입 페이지로 이동
+      - 로그아웃 버튼 -> 로그아웃 실행
+    ============================================================ */
+    loginBtn.addEventListener("click", () => showPage("login"));
+    signupBtn.addEventListener("click", () => showPage("signup"));
+    logoutBtn.addEventListener("click", doLogout);
+
+    /* 로그인/회원가입 실행 버튼 */
+    doLoginBtn.addEventListener("click", doLogin);
+    doSignupBtn.addEventListener("click", doSignup);
+
+    /* 각 페이지에서 "홈으로" */
+    goHomeFromLogin.addEventListener("click", () => showPage("home"));
+    goHomeFromSignup.addEventListener("click", () => showPage("home"));
+
+    /* ============================================================
+      [JS 14] init(초기화)
+      - 페이지가 처음 열릴 때 실행되는 코드
+      - localStorage에 저장된 세션이 있다면 자동으로 로그인 상태 복원
+    ============================================================ */
+    (function init(){
+      // 1) 저장된 세션 불러오기(없으면 null)
+      session = loadSession();
+
+      // 2) 화면에 로그인 상태 반영
+      renderHeaderButtons();
+      renderAdminMenu();
+      renderHomeStatus();
+
+      // 3) 시작 화면은 home
+      showPage("home");
+    })();
+  </script>
+</body>
+</html>
