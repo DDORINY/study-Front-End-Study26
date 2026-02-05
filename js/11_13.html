@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+   <title>스타일 조작 연습</title>
+</head>
+<body>
+ <button id="colorButton">색상 변경 버튼</button>
+
+ <script>
+ const button = document.getElementById('colorButton');
+
+ // 버튼 클릭 시 색상 변경
+ button.addEventListener('click', function() {
+ button.style.backgroundColor = 'skyblue';
+ button.style.color = 'white';
+ button.style.padding = '15px 30px';
+ button.style.border = 'none';
+ button.style.borderRadius = '10px';
+ });
+
+ </script>
+
+</body>
+</html>

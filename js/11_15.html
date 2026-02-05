@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="colorBox" style="width: 200px; height: 200px; border: 2px solid black; margin: 20px;">
+ 클릭해보세요!
+</div>
+<button id="randomButton">랜덤 색상 변경</button>
+
+<script>
+ const colorBox = document.getElementById('colorBox');
+ const randomButton = document.getElementById('randomButton');
+
+ // 랜덤 색상 생성 함수
+ function getRandomColor() {
+ const letters = '0123456789ABCDEF';
+ let color = '#';
+ for (let i = 0; i < 6; i++) {
+ color += letters[Math.floor(Math.random() * 16)];
+ }
+ return color;
+ }
+
+ randomButton.addEventListener('click', function() {
+ const randomColor = getRandomColor();
+
+ colorBox.style.backgroundColor = randomColor;
+ colorBox.style.color = 'white';
+ colorBox.style.textAlign = 'center';
+ colorBox.style.lineHeight = '200px';
+ colorBox.style.fontSize = '18px';
+ colorBox.style.fontWeight = 'bold';
+ colorBox.textContent = randomColor;
+ });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<title>다양한 이벤트</title>
+ <style>
+ .highlight { background-color: yellow; }
+ .container { margin: 20px; padding: 20px; border: 1px solid #ccc; }
+ </style>
+</head>
+<body>
+ <div class="container">
+ <button id="clickBtn">클릭 이벤트</button>
+ <button id="hoverBtn">마우스 올려보세요</button>
+ <input type="text" id="textInput" placeholder="여기에 입력하세요">
+ <div id="result">결과가 여기에 표시됩니다</div>
+ </div>
+
+ <script>
+ const clickBtn = document.getElementById('clickBtn');
+ const hoverBtn = document.getElementById('hoverBtn');
+ const textInput = document.getElementById('textInput');
+ const result = document.getElementById('result');
+
+ // 클릭 이벤트
+ clickBtn.addEventListener('click', function() {
+ result.textContent = '클릭 버튼이 눌렸습니다!';
+ });
+
+ // 마우스 호버 이벤트
+ hoverBtn.addEventListener('mouseover', function() {
+ this.classList.add('highlight');
+ result.textContent = '마우스가 버튼 위에 있습니다';
+ });
+
+ hoverBtn.addEventListener('mouseout', function() {
+ this.classList.remove('highlight');
+ result.textContent = '마우스가 버튼에서 벗어났습니다';
+ });
+
+ // 키보드 입력 이벤트
+ textInput.addEventListener('keyup', function() {
+ result.textContent = `입력한 내용: ${this.value}`;
+ });
+ </script>
+</body>
+</html>

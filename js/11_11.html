@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+ <meta charset="UTF-8">
+ <title>속성 조작 실습</title>
+</head>
+<body>
+<div id="linkContainer">
+ <h3>추천 사이트</h3>
+ <a id="recommendLink" href="https://www.google.com" target="_blank">
+ 구글 바로가기
+ </a>
+ <br><br>
+ <button onclick="changeSite('google')">구글</button>
+ <button onclick="changeSite('naver')">네이버</button>
+ <button onclick="changeSite('github')">깃허브</button>
+</div>
+
+<script>
+function changeSite(site) {
+ const link = document.getElementById('recommendLink');
+
+ // 사이트별 정보 객체
+ const siteInfo = {
+ google: {
+ url: 'https://www.google.com',
+ text: '구글 바로가기',
+ target: '_blank'
+ },
+ naver: {
+ url: 'https://www.naver.com',
+ text: '네이버 바로가기',
+ target: '_self'
+ },
+ github: {
+ url: 'https://www.github.com',
+ text: '깃허브 바로가기',
+ target: '_blank'
+ }
+ };
+
+ // 여러 속성을 한번에 변경
+ const info = siteInfo[site];
+ link.setAttribute('href', info.url);
+ link.setAttribute('target', info.target);
+ link.textContent = info.text;
+
+ console.log(`${site} 사이트로 변경됨`);
+}
+</script>
+
+</body>
+</html>

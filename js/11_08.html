@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+ <meta charset="UTF-8">
+ <title>현재 시간 표시</title>
+</head>
+<body>
+ <h2>현재 시간</h2>
+ <p id="currentTime">시간을 불러오는 중...</p>
+ <button onclick="updateTime()">시간 업데이트</button>
+
+ <script>
+ function updateTime() {
+ // 현재 시간 가져오기
+ let now = new Date();
+ let timeString = now.toLocaleString('ko-KR');
+
+ // 시간 표시 요소 선택 및 내용 변경
+ let timeElement = document.getElementById('currentTime');
+ timeElement.textContent = timeString;
+ }
+
+ // 페이지 로드 시 즉시 시간 표시
+ updateTime();
+ </script>
+</body>
+</html>

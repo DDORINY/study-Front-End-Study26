@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+ <div class="container">
+ <h2>상품 목록</h2>
+ <div class="product">사과 - 3,000원</div>
+ <div class="product">바나나 - 2,000원</div>
+ <div class="product">오렌지 - 4,000원</div>
+ </div>
+
+ <button onclick="highlightProducts()">상품 강조하기</button>
+
+ <script>
+ function highlightProducts() {
+ // 여러 요소 선택하는 다양한 방법
+ const container = document.querySelector('.container');
+ const products = document.querySelectorAll('.product');
+
+ // 컨테이너 스타일 변경
+ container.style.backgroundColor = '#f0f0f0';
+ container.style.padding = '20px';
+
+ // 모든 상품에 스타일 적용
+ products.forEach(function(product, index) {
+ product.style.backgroundColor = '#ffeb3b';
+ product.style.padding = '10px';
+ product.style.margin = '5px';
+ product.style.borderRadius = '5px';
+ });
+ }
+ </script>
+</body>
+</html>

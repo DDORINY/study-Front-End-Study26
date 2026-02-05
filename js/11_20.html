@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+ .container { padding: 20px; background: lightblue; }
+ .box { padding: 15px; background: lightgreen; margin: 10px; }
+ .button { padding: 10px; background: lightcoral; }
+ </style>
+</head>
+<body>
+ <div class="container" id="container">
+ 컨테이너
+ <div class="box" id="box">
+ 박스
+ <button class="button" id="button">버튼</button>
+ </div>
+ </div>
+
+ <div id="log"></div>
+
+ <script>
+ const container = document.getElementById('container');
+ const box = document.getElementById('box');
+ const button = document.getElementById('button');
+ const log = document.getElementById('log');
+
+ function addLog(message) {
+ log.innerHTML += message + '<br>';
+ }
+
+ // 버블링 단계에서 이벤트 처리
+ container.addEventListener('click', () => addLog('컨테이너 클릭됨'));
+ box.addEventListener('click', () => addLog('박스 클릭됨'));
+ button.addEventListener('click', () => addLog('버튼 클릭됨'));
+ </script>
+</body>
+</html>

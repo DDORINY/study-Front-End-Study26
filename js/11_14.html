@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<button id="toggleButton">토글 버튼</button>
+
+<script>
+ const toggleButton = document.getElementById('toggleButton');
+ let isActive = false;
+
+ toggleButton.addEventListener('click', function() {
+ if (isActive) {
+ // 원래 상태로 복원
+ toggleButton.style.backgroundColor = '';
+ toggleButton.style.color = '';
+ toggleButton.style.transform = '';
+ } else {
+ // 활성화 상태로 변경
+ toggleButton.style.backgroundColor = 'purple';
+ toggleButton.style.color = 'white';
+ toggleButton.style.transform = 'scale(1.1)';
+ }
+ isActive = !isActive;
+ });
+</script>
+
+</body>
+</html>

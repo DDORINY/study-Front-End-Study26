@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="loginForm">
+ <h3>로그인 방식 선택</h3>
+ <select onchange="changeLoginType(this.value)">
+ <option value="email">이메일 로그인</option>
+ <option value="phone">휴대폰 로그인</option>
+ <option value="id">아이디 로그인</option>
+ </select>
+ <br><br>
+
+ <input type="text" id="loginInput"
+ placeholder="이메일을 입력하세요"
+ maxlength="50">
+ <br><br>
+
+ <div id="inputInfo">이메일 형식으로 입력해주세요.</div>
+</div>
+
+<script>
+function changeLoginType(type) {
+ const input = document.getElementById('loginInput');
+ const info = document.getElementById('inputInfo');
+
+ // 로그인 타입별 설정
+ const typeSettings = {
+ email: {
+ placeholder: '이메일을 입력하세요 (예: user@example.com)',
+ type: 'email',
+ maxlength: '50',
+ infoText: '이메일 형식으로 입력해주세요.'
+ },
+ phone: {
+ placeholder: '휴대폰 번호를 입력하세요 (예: 010-1234-5678)',
+ type: 'tel',
+ maxlength: '13',
+ infoText: '하이픈(-)을 포함해서 입력해주세요.'
+ },
+ id: {
+ placeholder: '아이디를 입력하세요 (영문, 숫자 조합)',
+ type: 'text',
+ maxlength: '20',
+ infoText: '영문자와 숫자만 사용 가능합니다.'
+ }
+ };
+
+ const setting = typeSettings[type];
+
+ // 입력 필드 속성 변경
+ input.setAttribute('placeholder', setting.placeholder);
+ input.setAttribute('type', setting.type);
+ input.setAttribute('maxlength', setting.maxlength);
+
+ // 안내 텍스트 변경
+ info.textContent = setting.infoText;
+
+ // 기존 입력값 초기화
+ input.value = '';
+
+ console.log(`${type} 로그인 모드로 변경`);
+}
+</script>
+
+</body>
+</html>
